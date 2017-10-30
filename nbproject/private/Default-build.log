@@ -1,0 +1,7 @@
+-- Creating Object File From CPP obj/BucketList.o
+src/BucketList.cpp: In member function 'void BucketList::Setup(long unsigned int, long unsigned int, long unsigned int)':
+src/BucketList.cpp:26:35: error: 'powl' was not declared in this scope
+         if (powl(degree * 2 + 1, l) >= modCount) this->bktCount += modCount;
+                                   ^
+makefile:67: recipe for target 'obj/BucketList.o' failed
+make: *** [obj/BucketList.o] Error 1
