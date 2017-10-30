@@ -43,7 +43,7 @@
           <buildCommandWorkingDir>.</buildCommandWorkingDir>
           <buildCommand>${MAKE} -f makefile</buildCommand>
           <cleanCommand>${MAKE} -f makefile clean</cleanCommand>
-          <executablePath></executablePath>
+          <executablePath>nbproject\private\tools\localhost\Cygwin\gcc.exe</executablePath>
           <ccTool>
             <incDir>
               <pElem>inc</pElem>

@@ -5,18 +5,18 @@
 #	File Created: May 26, 2010
 #	File Modified: October 5, 2017
 
-CC  = icc
+CC  = gcc
 INC = ./inc
 SRC = ./src
 BIN = ./bin
 OBJ = ./obj
 LIB =
 DEBUG = -g
-FLAGS =  ${DEBUG} -I./inc -O0
+FLAGS =  ${DEBUG} -I./inc -O0 -std=c99
 
 default: main
 
-OBJECTS = Circuit.o BucketList.o Sanchis.o ModList.o NetList.o
+OBJECTS = Circuit.o BucketList.o Sanchis.o
 
 MAIN = main.o ${OBJECTS}
 main: $(addprefix ${OBJ}/, ${MAIN})

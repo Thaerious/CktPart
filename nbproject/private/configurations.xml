@@ -66,10 +66,13 @@
       <runprofile version="9">
         <runcommandpicklist>
           <runcommandpicklistitem>"${OUTPUT_PATH}"</runcommandpicklistitem>
+          <runcommandpicklistitem>"${OUTPUT_PATH}" /ckt/chip1.net</runcommandpicklistitem>
+          <runcommandpicklistitem>"${OUTPUT_PATH}" ckt/chip1.net</runcommandpicklistitem>
+          <runcommandpicklistitem>"${OUTPUT_PATH}" ckt/chip1.netlist</runcommandpicklistitem>
         </runcommandpicklist>
-        <runcommand>"${OUTPUT_PATH}"</runcommand>
+        <runcommand>"${OUTPUT_PATH}" ckt/chip1.netlist</runcommand>
         <rundir>.</rundir>
-        <buildfirst>false</buildfirst>
+        <buildfirst>true</buildfirst>
         <terminal-type>0</terminal-type>
         <remove-instrumentation>0</remove-instrumentation>
         <environment>
