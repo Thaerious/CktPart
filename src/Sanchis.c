@@ -17,15 +17,9 @@
 #define setupBeta(s) (Sanchis_setupBeta(this, s))
 #define setupGains(s) (Sanchis_setupGains(this, s))
 
-#define updateMaxModule(bl) (BucketList_updateMaxModule(bl))
-#define insert(bl, a, b) (BucketList_insert(bl, a, b))
-#define compare(bl, aa, bb) (BucketList_compare(bl, aa, bb))
-#define setup(bl, degree, level, modcount) (BucketList_setup(bl, degree, level, modcount))
-#define recalculateMax(bl) (BucketList_recalculateMax(bl))
 #define set(bl, m) (BucketList_set(bl, m))
 #define remove(bl, m) (BucketList_remove(bl, m))
 #define reset(bl) (BucketList_reset(bl))
-#define removeMax(bl) (BucketList_removeMax(bl))
 #define getMax(bl) (BucketList_getMax(bl))
 #define getVector(bl, m) (BucketList_getVector(bl, m))
 #define size(bl) (BucketList_size(bl))
@@ -50,6 +44,7 @@ Sanchis* newSanchis(Circuit* ckt, int ibal, int level) {
     this->level = level;
     this->gains[0] = newBucketList(modCount(this->ckt), level);
     this->gains[1] = newBucketList(modCount(this->ckt), level);
+
     this->lockedNets = 0;
     this->passCap = 0;
     this->repairCount = 0;
@@ -74,7 +69,7 @@ void deleteSanchis(Sanchis* this) {
 //    delete(this->gains[1]);
 }
 
-void Sanchis_setPassCap(Sanchis* this,  int i) {
+void Sanchis_setPassCap(Sanchis* this, int i) {
     this->passCap = i;
 }
 
@@ -82,9 +77,8 @@ int Sanchis_passCount(Sanchis* this) {
     return this->passCnt;
 }
 
-void Sanchis_repair(Sanchis* this,  SOLUTION solution) {
+void Sanchis_repair(Sanchis* this, SOLUTION solution) {
     int curCutSize = cutSize(this->ckt, solution);
-    int before = curCutSize;
     int pCount = 0;
 
     do {
@@ -98,7 +92,7 @@ void Sanchis_repair(Sanchis* this,  SOLUTION solution) {
     this->repairCount++;
 }
 
-void Sanchis_pass(Sanchis* this,  SOLUTION solution) {
+void Sanchis_pass(Sanchis* this, SOLUTION solution) {
     setupVariables(solution);
     while (move(solution) >= 0);
     updateSolution(solution);
@@ -106,13 +100,13 @@ void Sanchis_pass(Sanchis* this,  SOLUTION solution) {
     reset(this->gains[1]);
 }
 
-void Sanchis_updateSolution(Sanchis* this,  SOLUTION solution) {
+void Sanchis_updateSolution(Sanchis* this, SOLUTION solution) {
     for (int i = 0; i <= this->bestMove; i++) {
         solution[this->cellMoveArray[i]] = this->blockMoveArray[i];
     }
 }
 
-void Sanchis_setupVariables(Sanchis* this,  SOLUTION solution) {
+void Sanchis_setupVariables(Sanchis* this, SOLUTION solution) {
     memset(this->locked, 0, sizeof (int) * modCount(this->ckt)); /* clear this->locked */
 
     setupBeta(solution);
@@ -132,7 +126,7 @@ void Sanchis_setupVariables(Sanchis* this,  SOLUTION solution) {
     this->lockedNets = 0;
 }
 
-void Sanchis_setupBeta(Sanchis* this,  SOLUTION solution) {
+void Sanchis_setupBeta(Sanchis* this, SOLUTION solution) {
     memset(this->beta[0], 0, sizeof (int) * netCount(this->ckt));
     memset(this->beta[1], 0, sizeof (int) * netCount(this->ckt));
 
@@ -145,7 +139,7 @@ void Sanchis_setupBeta(Sanchis* this,  SOLUTION solution) {
     }
 }
 
-void Sanchis_setupGains(Sanchis* this,  SOLUTION solution) {
+void Sanchis_setupGains(Sanchis* this, SOLUTION solution) {
     for (int m = 0; m < modCount(this->ckt); m++) {
         for (int i = 0; i < this->level; i++) {
             getVector(this->gains[0], m)[i] = 0;
@@ -166,23 +160,21 @@ void Sanchis_setupGains(Sanchis* this,  SOLUTION solution) {
     }
 }
 
-int Sanchis_move(Sanchis* this,  SOLUTION solution) {
+int Sanchis_move(Sanchis* this, SOLUTION solution) {
     if (this->lockedCount == modCount(this->ckt)) return -1;
     int cell = getBestMove();
+    printf("move cell %d\n", cell);
     if (cell < 0) return -1;
-
     if (this->lockedNets >= this->lastCutSize - this->bestGain) return -1;
-
     moveMod(solution, cell);
     return cell;
 }
 
-int Sanchis_moveMod(Sanchis* this,  SOLUTION solution, int mod) {
-    int BF = solution[mod];
-    int BT = BF ? 0 : 1;
+int Sanchis_moveMod(Sanchis* this, SOLUTION solution, int mod) {
+    int BF = solution[mod]; /* block from */
+    int BT = BF ? 0 : 1;    /* block to */
 
     this->currentGain += getVector(this->gains[solution[mod]], mod)[0];
-
     this->cellMoveArray[this->currentMove] = mod;
     this->blockMoveArray[this->currentMove] = BT;
 
@@ -211,7 +203,7 @@ int Sanchis_moveMod(Sanchis* this,  SOLUTION solution, int mod) {
     return (getMod(this->ckt, mod)[0]);
 }
 
-void Sanchis_updateGains(Sanchis* this,  SOLUTION solution, int c) {
+void Sanchis_updateGains(Sanchis* this, SOLUTION solution, int c) {
     int CF = solution[c];
     int CT = CF ? 0 : 1;
     int betaFrom = 0;
@@ -264,6 +256,8 @@ void Sanchis_updateGains(Sanchis* this,  SOLUTION solution, int c) {
 }
 
 int Sanchis_getBestMove(Sanchis* this) {
+    int rvalue = -3;
+
     int c0 = getMax(this->gains[0]);
     int c1 = getMax(this->gains[1]);
 
@@ -275,17 +269,19 @@ int Sanchis_getBestMove(Sanchis* this) {
 
     if (this->balance >= this->minBalance && this->balance <= this->maxBalance) {
         if (size(this->gains[0]) > 0 && size(this->gains[1]) > 0) {
-            if (g0 > g1) return c0;
-            else if (g0 < g1) return c1;
-            else if (this->balance > 0) return c1;
-            else if (this->balance < 0) return c0;
-            else return c0;
-        } else if (size(this->gains[0]) > 0) return c0;
-        else if (size(this->gains[1]) > 0) return c1;
-        else return -2;
+            if (g0 > g1) rvalue = c0;
+            else if (g0 < g1) rvalue = c1;
+            else if (this->balance > 0) rvalue = c1;
+            else if (this->balance < 0) rvalue = c0;
+            else rvalue = c0;
+        } else if (size(this->gains[0]) > 0) rvalue = c0;
+        else if (size(this->gains[1]) > 0) rvalue = c1;
+        else rvalue = -2;
     } else if (this->balance < this->minBalance && size(this->gains[0]) > 0) {
-        return c0;
+        rvalue = c0;
     } else if (this->balance > this->maxBalance && size(this->gains[1]) > 0) {
-        return c1;
-    } else return -1;
+        rvalue = c1;
+    } else rvalue = -1;
+
+    return rvalue;
 }

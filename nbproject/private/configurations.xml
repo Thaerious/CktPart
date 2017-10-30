@@ -54,6 +54,8 @@
         <gdb_interceptlist>
           <gdbinterceptoptions gdb_all="false" gdb_unhandled="true" gdb_unexpected="true"/>
         </gdb_interceptlist>
+        <gdb_signals>
+        </gdb_signals>
         <gdb_options>
           <DebugOptions>
           </DebugOptions>
@@ -69,8 +71,9 @@
           <runcommandpicklistitem>"${OUTPUT_PATH}" /ckt/chip1.net</runcommandpicklistitem>
           <runcommandpicklistitem>"${OUTPUT_PATH}" ckt/chip1.net</runcommandpicklistitem>
           <runcommandpicklistitem>"${OUTPUT_PATH}" ckt/chip1.netlist</runcommandpicklistitem>
+          <runcommandpicklistitem>./bin/main ckt/chip1.netlist</runcommandpicklistitem>
         </runcommandpicklist>
-        <runcommand>"${OUTPUT_PATH}" ckt/chip1.netlist</runcommand>
+        <runcommand>./bin/main ckt/chip1.netlist</runcommand>
         <rundir>.</rundir>
         <buildfirst>true</buildfirst>
         <terminal-type>0</terminal-type>

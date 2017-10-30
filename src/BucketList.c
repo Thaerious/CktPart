@@ -10,12 +10,33 @@
 
 BucketList* newBucketList(int modCount, int level) {
     BucketList* this = calloc(1, sizeof (BucketList));
-    BucketList_setup(this, BUCKET_WIDTH, (ULONG) this->level, modCount);
+    BucketList_setup(this, BUCKET_WIDTH, (ULONG) level, modCount);
+    return this;
 }
 
-int BucketList_removeMax(BucketList* this) {
-    BucketList_remove(this, this->maxModule);
-    return this->maxModule;
+void BucketList_setup(BucketList* this, ULONG degree, ULONG level, ULONG modCount) {
+    degree = 10;
+    this->degree = degree;
+    this->level = level;
+    this->modCount = modCount;
+    this->bktSize = degree * 2 + 3;
+    this->maxModule = -1;
+    this->bktCount = 0;
+    this->bktCount = 0;
+    this->sz = 0;
+
+    for (ULONG l = 0; l < this->level; l++) {
+        if ((ULONG) pow(this->degree * 2 + 1, l) >= modCount) this->bktCount += this->modCount;
+        else this->bktCount += (ULONG) pow((double) this->degree * 2 + 1, (double) l);
+    }
+
+    this->next = (ULONG*) calloc(this->modCount, sizeof (ULONG));
+    this->prev = (ULONG*) calloc(this->modCount, sizeof (ULONG));
+    this->buckets = (ULONG*) calloc(this->bktCount * this->bktSize, sizeof (ULONG));
+    this->vectors = (int*) calloc(this->modCount * (this->level), sizeof (int));
+    this->root = &this->buckets[0];
+
+    BucketList_reset(this);
 }
 
 int BucketList_getMax(BucketList* this) {
@@ -28,29 +49,6 @@ int* BucketList_getVector(BucketList* this, int m) {
 
 int BucketList_size(BucketList* this) {
     return this->sz;
-}
-
-void BucketList_setup(BucketList* this, ULONG degree, ULONG level, ULONG modCount) {
-    degree = 10;
-    this->degree = degree;
-    this->level = level;
-    this->modCount = modCount;
-    this->bktSize = degree * 2 + 3;
-    this->maxModule = -1;
-    this->bktCount = 0;
-    this->sz = 0;
-
-    for (ULONG l = 0; l < this->level; l++) {
-        if ((ULONG) pow(this->degree * 2 + 1, l) >= modCount) this->bktCount += this->modCount;
-        else this->bktCount += (ULONG) pow((double) this->degree * 2 + 1, (double) l);
-    }
-
-    this->next = (ULONG*) calloc(this->modCount, sizeof (ULONG));
-    this->prev = (ULONG*) calloc(this->modCount, sizeof (ULONG));
-    this->buckets = (ULONG*) calloc(this->bktCount * this->bktSize, sizeof (ULONG));
-    this->vectors = (int*) calloc(this->modCount * this->level, sizeof (int));
-    this->root = &this->buckets[0];
-    BucketList_reset(this);
 }
 
 void deleteBucketList(BucketList** thisp) {
@@ -169,19 +167,24 @@ void BucketList_set(BucketList* this, int m) {
 }
 
 void BucketList_remove(BucketList* this, int m) {
+    printf("BucketList_remove %d\n", m);
     if (this->prev[m] == NaN) return;
     this->sz--;
 
-    /* the this->prev value is a module not a bucket */
+
     if (this->prev[m] < (ULONG) this->root) {
+        /* the this->prev value is a module not a bucket */
         this->next[this->prev[m]] = this->next[m];
         if (this->next[m] != NaN) this->prev[this->next[m]] = this->prev[m];
-    } else { /* the this->prev value is a bucket */
-        if (this->next[m] != NaN) { /* there is a this->next module */
+    } else {
+        /* the this->prev value is a bucket */
+        if (this->next[m] != NaN) {
+            /* there is a this->next module */
             *((ULONG*) this->prev[m]) = this->next[m];
             this->prev[this->next[m]] = this->prev[m];
             if (m == this->maxModule) this->maxModule = this->next[m];
-        } else { /* there is no this->next module */
+        } else {
+            /* there is no this->next module */
             int offset = ((this->prev[m] - (ULONG) (this->root)) / (sizeof (ULONG))) % this->bktSize;
             ULONG* parent = (ULONG*) (this->prev[m] - (offset * sizeof (ULONG)));
 

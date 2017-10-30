@@ -31,7 +31,7 @@ typedef struct {
 
         ULONG* next;
         ULONG* prev;
-        int* vectors;
+        int* vectors; /* one vector for each module */
 
         ULONG* root;
         ULONG* emptyBuckets;

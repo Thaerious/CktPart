@@ -10,7 +10,7 @@ INC = ./inc
 SRC = ./src
 BIN = ./bin
 OBJ = ./obj
-LIB =
+LIB = -lm
 DEBUG = -g
 FLAGS =  ${DEBUG} -I./inc -O0 -std=c99
 

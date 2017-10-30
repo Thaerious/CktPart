@@ -17,7 +17,7 @@ int main(int argc, char** argv) {
     printf("circuit net count: %d\n", netCount(ckt));
     printf("circuit mod count: %d\n", modCount(ckt));
 
-    srand(12345);
+    srand(time(0));
 
     int count = 1;
     if (argc > 2) sscanf(argv[2], "%d", &count);
@@ -28,7 +28,10 @@ int main(int argc, char** argv) {
             solution[i] = r;
         }
 
+        int before = cutSize(ckt, solution);
         Sanchis_repair(sanchis, solution);
+        int after = cutSize(ckt, solution);
+        printf("%d %d\n", before, after);
     }
 
     free(solution);
